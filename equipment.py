@@ -25,6 +25,3 @@ class Equipment:
         string += '\tEmplacement:' + str(self.emplacement.id) + '\n'
 
         return string
-
-    def __repr__(self):
-        return str(self)

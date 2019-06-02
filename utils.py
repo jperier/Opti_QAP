@@ -69,39 +69,49 @@ def tabou(f_voisin, f_obj, s, list_size, max_iter):
     f_min = f_obj(s)
     tabu_list = []
 
+    count = 0
+
     for i in tqdm(range(max_iter)):
-        voisins = f_voisin(s)
-        s = min(voisins, lambda x: f_obj(x))
-        deltaf = f_min - f_obj(s)
+        s, f_current, permutation = f_voisin(s, f_obj, tabu_list)
 
-        if deltaf > 0:
-            tabu_list.append(find_permute()) #s_old
+        if f_min < f_current:
+            tabu_list.append(permutation)
+            if len(tabu_list) > list_size:
+                tabu_list.pop(0)
+        else:
+            s_min = s
+            f_min = f_current
 
+    return s_min
 
 
 # Fonctions de voisinage :
 
-def find_permute(s1, s2):
-    permut = set()
-    for i in range(len(s1.emplacements)):
-        if s1.x[i] != s2.x[i]:
-            permut.add(i)
-            if len(permut) == 2:
-                return permut
-
-def v_permute_all(s):
-    voisins = []
+def get_best_voisin(s, f_obj, tabu_list):
+    s_min = None
+    f_min = float('inf')
+    permutation = None
+    count = 0
     for i in range(len(s.emplacements)):
-        for j in range(i, s.emplacements):
-            s2 = s.copy()
-            cache = s2.x[i]
-            s2.x[i] = s2.x[j]
-            s2.x[j] = cache
-            voisins.append(s2)
-    return voisins
+        for j in range(i+1, len(s.emplacements)):
+
+            if {i, j} not in tabu_list:
+
+                s2 = s.copy()
+                cache = s2.x[i]
+                s2.x[i] = s2.x[j]
+                s2.x[j] = cache
+
+                obj = f_obj(s2)
+                if obj < f_min:
+                    f_min = obj
+                    s_min = s2
+                    permutation = {i, j}
+
+    return s_min, f_min, permutation
 
 
-def v_permute_100(s):
+def v_permute_100(s):   # TODO: utilise des sets et déjà fait est jamais rempli boloss
     voisins = []
     deja_fait = []
     for i in range(100):
@@ -143,6 +153,16 @@ def obj_simple(s: Solution):
 
         for emp2, eq2 in s.x.items():
             if not emp2 in deja_fait:
+                sum += s.emplacements[emp].distances[emp2] * s.equipments[eq].weights[eq2]
+    return sum*2
+
+def obj_simple_2(s: Solution):
+
+    sum = 0
+
+    for emp, eq in s.x.items():
+        for emp2, eq2 in s.x.items():
+            if not(emp == emp2 or eq == eq2):
                 sum += s.emplacements[emp].distances[emp2] * s.equipments[eq].weights[eq2]
     return sum
 
