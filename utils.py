@@ -3,7 +3,7 @@ from equipment import Equipment
 from solution import Solution
 from random import randint, random
 from math import exp
-from tqdm import tqdm
+from time import process_time
 
 
 def extract(filepath):
@@ -29,25 +29,36 @@ def extract(filepath):
     return emplacements, equipments
 
 
-def recuit(f_voisin, f_obj, s, t, n1, n2, mu):
+def recuit(f_voisin, f_obj, s, t, n, mu, max_time=100, return_stats=False):
     """
     voisin : fonction de voisinage
     fObj : fonction objectif
     s : solution initiale
     t0 : température initiale
-    n1 : nombre de changement de température
-    n2 : nombre de mouvements à la température tk
+    n : nombre de mouvements à la température tk
     mu : baisse de température ( < 1)
     """
+    assert max_time > 0
 
     s_min = s.copy()
     f_min = f_obj(s)
 
-    for k in tqdm(range(n1)):
-        for l in range(n2):
+    start_time = process_time()
+    time = 0
+
+    nb_steps = 0
+    value_at_steps = []
+    min_at_steps = []
+
+    while time < max_time:                      # TODO : n nb d'itérations en fct de max_time
+
+        for i in range(n):
+            nb_steps += 1
+
             y = f_voisin(s)     # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
             new_obj = f_obj(y)
-            deltaf = new_obj - f_obj(s)
+            f = f_obj(s)
+            deltaf = new_obj - f
 
             if deltaf < 0:
                 s = y
@@ -58,20 +69,37 @@ def recuit(f_voisin, f_obj, s, t, n1, n2, mu):
                 p = random()
                 expo = exp((-1*deltaf)/t)
                 if p < expo:
-                    s = y
+                    s = y.copy()
+
+            # Stats
+            if return_stats:
+                if nb_steps % 25 == 0:
+                    value_at_steps.append(f)
+                    min_at_steps.append(f_min)
+
         t = mu*t
-    return s_min
+
+        time = (process_time()-start_time)
+
+    print('nb_steps=', nb_steps)
+    return s_min, f_min, nb_steps, value_at_steps, min_at_steps
 
 
-def tabou(f_voisin, f_obj, s, list_size, max_iter):
+def tabou(f_voisin, f_obj, s, list_size, max_time=100, return_stats=False):
+    assert max_time > 0
 
     s_min = s.copy()
     f_min = f_obj(s)
     tabu_list = []
 
-    count = 0
+    start_time = process_time()
 
-    for i in tqdm(range(max_iter)):
+    nb_steps = 0
+    value_at_steps = []
+    min_at_steps = []
+
+    while (process_time() - start_time) < max_time:
+        nb_steps += 1
         s, f_current, permutation = f_voisin(s, f_obj, tabu_list)
 
         if f_min < f_current:
@@ -79,19 +107,108 @@ def tabou(f_voisin, f_obj, s, list_size, max_iter):
             if len(tabu_list) > list_size:
                 tabu_list.pop(0)
         else:
-            s_min = s
+            s_min = s.copy()
             f_min = f_current
 
-    return s_min
+        # Stats
+        if return_stats:
+            if nb_steps % 25 == 0:
+                value_at_steps.append(f_current)
+                min_at_steps.append(f_min)
+    print('nb_steps=', nb_steps)
+    return s_min, f_min, nb_steps, value_at_steps, min_at_steps
+
+
+def brute_force(f_obj, s, max_time=100, return_stats=False):
+    assert max_time > 0
+
+    s_min = s.copy()
+    f_min = f_obj(s)
+
+    start_time = process_time()
+
+    nb_steps = 0
+    value_at_steps = []
+    min_at_steps = []
+
+    while (process_time() - start_time) < max_time:
+        nb_steps += 1
+        # New random solution
+        s = Solution(s.emplacements, s.equipments)
+        f = f_obj(s)
+
+        if f < f_min:
+            s_min = s.copy()
+            f_min = f
+
+        # Stats
+        if return_stats:
+            if nb_steps % 25 == 0:
+                value_at_steps.append(f)
+                min_at_steps.append(f_min)
+
+    return s_min, f_min, nb_steps, value_at_steps, min_at_steps
+
+
+def descente(f_obj, s, max_time=100, return_stats=False):
+    assert max_time > 0
+
+    s_min_global = s.copy()
+    f_min_global = f_obj(s)
+
+    s_min = s.copy()
+    f_min = f_obj(s)
+
+    start_time = process_time()
+
+    nb_steps = 0
+    value_at_steps = []
+    min_at_steps = []
+    nb_restart = 0
+
+    while (process_time() - start_time) < max_time:
+        nb_steps+=1
+        s, f, _ = get_best_voisin(s, f_obj)
+
+        # Descente
+        if f < f_min:
+            s_min = s.copy() #copyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+            f_min = f
+            if f < f_min_global:
+                s_min_global = s.copy()
+                f_min_global = f
+
+
+        # Nouveau départ
+        else:
+            nb_restart+=1
+            s = Solution(s.emplacements, s.equipments)
+            s_min = s.copy() #copyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+            f_min = f_obj(s_min)
+
+        # Stats
+        if return_stats:
+            if nb_steps % 25 == 0:
+                value_at_steps.append(f)
+                min_at_steps.append(f_min_global)
+
+    print('nb_step=', nb_steps)
+    print('nb_restart=', nb_restart)
+
+    return s_min_global, f_min_global, nb_steps, value_at_steps, min_at_steps
 
 
 # Fonctions de voisinage :
 
-def get_best_voisin(s, f_obj, tabu_list):
+def get_best_voisin(s, f_obj, tabu_list=None):
+
+    if tabu_list is None:
+        tabu_list = []
+
     s_min = None
     f_min = float('inf')
     permutation = None
-    count = 0
+
     for i in range(len(s.emplacements)):
         for j in range(i+1, len(s.emplacements)):
 
@@ -155,6 +272,7 @@ def obj_simple(s: Solution):
             if not emp2 in deja_fait:
                 sum += s.emplacements[emp].distances[emp2] * s.equipments[eq].weights[eq2]
     return sum*2
+
 
 def obj_simple_2(s: Solution):
 
