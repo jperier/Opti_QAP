@@ -3,7 +3,13 @@ from equipment import Equipment
 from solution import Solution
 from utils import extract, obj_simple, obj_simple_2, v_permute_one, recuit, tabou, brute_force, descente, get_best_voisin
 from time import perf_counter
-path = "data/tai12a.dat"
+from os import listdir
+from os.path import isfile, join
+
+path = 'data/'
+files = [f for f in listdir(path) if isfile(join(path, f))]
+
+#print(files)
 
 
 emplacements, equipments = extract(path)
