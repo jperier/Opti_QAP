@@ -89,8 +89,6 @@ for f in files:
         s = solutions[d['file']]
 
         for max_time in d["runtimes"]:
-            if TEST_MODE:
-                max_time = 1
 
             if log_file is not None:
                 log_file.close()
@@ -98,6 +96,9 @@ for f in files:
 
             logprint("\n\n**************************************************")
             logprint(now, '\n')
+            if TEST_MODE:
+                max_time = 1
+                logprint('----- TEST MODE ------')
             logprint('Config : ', f, '\n')
             logprint(d)
             logprint('runtime = ', max_time)
