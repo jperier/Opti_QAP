@@ -43,7 +43,7 @@ def make_graph(file, nb_steps, value_at_steps, min_at_steps):
 
 # *********************************************************************************************
 
-TEST_MODE = True
+TEST_MODE = False
 plt.rcParams['figure.figsize'] = [25, 10]   # Pour que ce soit plus grand
 
 conf_path = 'configs/'
@@ -94,6 +94,7 @@ for f in files:
                 log_file.close()
             log_file = open('logs/'+f[:-5]+'.log', 'a')
 
+            now = datetime.datetime.now()
             logprint("\n\n**************************************************")
             logprint(now, '\n')
             if TEST_MODE:
