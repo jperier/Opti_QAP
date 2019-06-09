@@ -1,1 +1,1 @@
-{"file": "tai80a.dat", "algo": "tabou", "list_sizes": [100, 1000], "runtimes": [600, 1800], "f_voisin_small": false}
+{"file": "tai50a.dat", "algo": "tabou", "list_sizes": [100, 1000], "runtimes": [600, 1800], "f_voisin_small": false}
