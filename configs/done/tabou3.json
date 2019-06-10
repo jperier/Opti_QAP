@@ -1,0 +1,1 @@
+{"file": "tai50a.dat", "algo": "tabou", "list_sizes": [100, 1000], "runtimes": [60, 600], "f_voisin_small": true}
