@@ -37,7 +37,7 @@ def make_graph(file, nb_steps, value_at_steps, min_at_steps):
         os.mkdir(graph_path)
     except FileExistsError:
         pass
-    plt.savefig(graph_path + str(now.day)+'_'+str(now.hour)+'h'+str(now.minute)+'.pdf')
+    plt.savefig(graph_path + str(now.day)+'_'+str(now.hour)+'h'+str(now.minute)+'.png')
     plt.close()
 
 
