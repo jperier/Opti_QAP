@@ -98,7 +98,7 @@ def recuit(f_voisin, f_obj, s, mu, max_time=100, return_stats=False):
 
             # Stats
             if return_stats:
-                if nb_steps % NB_STEPS_SAVE == 0:
+                if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
                     value_at_steps.append(f)
                     min_at_steps.append(f_min)
 
@@ -122,9 +122,6 @@ def tabou(f_voisin, f_obj, s, list_size, max_time=100, return_stats=False):
     value_at_steps = []
     min_at_steps = []
 
-    assert s is not None
-    print(s)
-
     while (process_time() - start_time) < max_time:
         nb_steps += 1
         s, f_current, permutation = f_voisin(s, f_obj, tabu_list)
@@ -139,7 +136,7 @@ def tabou(f_voisin, f_obj, s, list_size, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0:
+            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
                 value_at_steps.append(f_current)
                 min_at_steps.append(f_min)
 
@@ -170,7 +167,7 @@ def brute_force(f_obj, s, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0:
+            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
                 value_at_steps.append(f)
                 min_at_steps.append(f_min)
 
@@ -214,7 +211,7 @@ def descente(f_voisin, f_obj, s, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0:
+            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
                 value_at_steps.append(f)
                 min_at_steps.append(f_min_global)
 

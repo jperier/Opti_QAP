@@ -49,6 +49,9 @@ plt.rcParams['figure.figsize'] = [25, 10]   # Pour que ce soit plus grand
 conf_path = 'configs/'
 files = [f for f in listdir(conf_path) if isfile(join(conf_path, f))]
 
+if "main.json" in files:
+    files.remove("main.json")
+
 # Calcul temps total, initialisation des solutions
 tps_total = 0
 solutions = {}
@@ -61,8 +64,6 @@ for f in files:
 
             elif d['algo'] == 'tabou':
                 n = len(d['list_sizes'])
-                if d['f_voisin_small']:
-                    n *= 2
 
             elif d['algo'] == 'descente' and d['f_voisin_small']:
                 n = 2
