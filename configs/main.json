@@ -1,1 +1,1 @@
-{"file": "tai12a.dat", "nb_tests": 5, "runtime": 10, "mu": 0.90, "list_size": 25}
+{"file": "tai100a.dat", "nb_tests": 5, "runtime": 600, "mu": 0.99, "list_size": 100}
