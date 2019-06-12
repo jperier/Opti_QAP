@@ -5,7 +5,8 @@ from random import randint, random
 from math import exp, log
 from time import process_time
 
-NB_STEPS_SAVE = 25
+NB_STEPS_SAVE_tabou_descente = 1
+NB_STEPS_SAVE_bf_recuit = 50
 
 
 def extract(filepath):
@@ -98,7 +99,7 @@ def recuit(f_voisin, f_obj, s, mu, max_time=100, return_stats=False):
 
             # Stats
             if return_stats:
-                if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
+                if nb_steps % NB_STEPS_SAVE_bf_recuit == 0 or nb_steps == 1:
                     value_at_steps.append(f)
                     min_at_steps.append(f_min)
 
@@ -136,7 +137,7 @@ def tabou(f_voisin, f_obj, s, list_size, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
+            if nb_steps % NB_STEPS_SAVE_tabou_descente == 0 or nb_steps == 1:
                 value_at_steps.append(f_current)
                 min_at_steps.append(f_min)
 
@@ -167,7 +168,7 @@ def brute_force(f_obj, s, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
+            if nb_steps % NB_STEPS_SAVE_bf_recuit == 0 or nb_steps == 1:
                 value_at_steps.append(f)
                 min_at_steps.append(f_min)
 
@@ -211,7 +212,7 @@ def descente(f_voisin, f_obj, s, max_time=100, return_stats=False):
 
         # Stats
         if return_stats:
-            if nb_steps % NB_STEPS_SAVE == 0 or nb_steps == 1:
+            if nb_steps % NB_STEPS_SAVE_tabou_descente == 0 or nb_steps == 1:
                 value_at_steps.append(f)
                 min_at_steps.append(f_min_global)
 
